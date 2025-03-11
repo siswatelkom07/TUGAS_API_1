@@ -162,7 +162,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     SizedBox(height: 10,),
                     MaterialButton(onPressed: (){
-                      Navigator.pushNamed(context, '/');
+                      Navigator.pushNamed(context, '/login');
                       
                     },child: Text("Login",style: TextStyle(color: Colors.white),),color: const Color.fromARGB(255, 255, 0, 0),)
                   ],

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_application_1/models/login_model.dart';
 import 'package:flutter_application_1/models/response_data_map.dart';
 import 'package:flutter_application_1/services/url.dart' as url;
 import 'package:http/http.dart' as http;
@@ -35,29 +36,36 @@ class UserService {
       
     } 
   }
-  /*Future loginUser(data) async {
-    var uri = Uri.parse(url.BaseUrl + "/auth/login");
+  Future loginUser(data) async {
+    var uri = Uri.parse(url.BaseUrl + "login");
+    print("Login URL: $uri"); // Debug print
+    print("Login Data: $data"); // Debug print
     var register = await http.post(uri, body: data);
 
+    print("Response Status Code: ${register.statusCode}"); // Debug print
+    print("Response Body: ${register.body}"); // Debug print
 
     if (register.statusCode == 200) {
-      var data = json.decode(register.body);
-      if (data["status"] == true) {
+      var responseData = json.decode(register.body);
+      if (responseData["status"] == true) {
+        var userData = responseData["data"];
         UserLogin userLogin = UserLogin(
-            status: data["status"],
-            token: data["token"],
-            message: data["message"],
-            id: data["user"]["id"],
-            nama_user: data["user"]["nama_user"],
-            email: data["user"]["email"],
-            role: data["user"]["role"]);
+            status: responseData["status"],
+            token: responseData["authorisation"]["token"],
+            message: responseData["message"],
+            id: userData["id"],
+            nama_user: userData["name"],
+            email: userData["email"],
+            role: userData["role"]);
         await userLogin.prefs();
         ResponseDataMap response = ResponseDataMap(
-            status: true, message: "Sukses login user", data: data);
+            status: true, message: "Sukses login user", data: responseData);
+        print("Login Success: ${response.message}"); // Debug print
         return response;
       } else {
         ResponseDataMap response =
             ResponseDataMap(status: false, message: 'Email dan password salah');
+        print("Login Failed: ${response.message}"); // Debug print
         return response;
       }
     } else {
@@ -65,8 +73,9 @@ class UserService {
           status: false,
           message:
               "gagal menambah user dengan code error ${register.statusCode}");
+      print("Login Error: ${response.message}"); // Debug print
       return response;
     }
-  }*/
+  }
 
 }

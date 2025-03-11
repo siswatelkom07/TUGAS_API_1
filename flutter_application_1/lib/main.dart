@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/views/home.dart';
+import 'package:flutter_application_1/views/login_view.dart';
 import 'package:flutter_application_1/views/register_view.dart';
 
 void main() {
   runApp(MaterialApp(
     initialRoute: '/register',
     routes: {
-      '/register':(context)=>RegisterView()
+      '/register':(context)=>RegisterView(),
+      '/login':(context)=>LoginView(),
+      '/home':(context)=>Home()
     },
   ));
 }
