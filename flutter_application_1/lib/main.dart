@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/views/home.dart';
 import 'package:flutter_application_1/views/login_view.dart';
+import 'package:flutter_application_1/views/movie_view.dart';
 import 'package:flutter_application_1/views/register_view.dart';
 
 void main() {
@@ -9,7 +10,8 @@ void main() {
     routes: {
       '/register':(context)=>RegisterView(),
       '/login':(context)=>LoginView(),
-      '/home':(context)=>Home()
+      '/home':(context)=>Home(),
+      '/movie':(context)=>MovieView(),
     },
   ));
 }

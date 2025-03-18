@@ -101,7 +101,7 @@ class _LoginViewState extends State<LoginView> {
                         child: isLoading == false
                             ? Text("LOGIN")
                             : CircularProgressIndicator(),
-                        color: Colors.lightGreen,
+                        color: const Color.fromARGB(255, 255, 0, 0),
                       )
                     ],
                   ))
