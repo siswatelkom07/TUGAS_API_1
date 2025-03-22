@@ -4,6 +4,7 @@ import 'package:flutter_application_1/services/movie_service.dart';
 import 'package:flutter_application_1/widgets/bottom_nav.dart';
 import 'package:flutter_application_1/widgets/alert.dart';
 import 'package:flutter_application_1/views/tambah_movie_view.dart';
+import 'package:flutter_application_1/models/movie_model.dart';
 
 class MovieView extends StatefulWidget {
   const MovieView({super.key});
@@ -14,7 +15,7 @@ class MovieView extends StatefulWidget {
 class _MovieViewState extends State<MovieView> {
   MovieService movieService = MovieService();
   List? film;
-  List action = ["Update", "Delete"];
+  List<String> action = ["Update", "Delete"];
 
   @override
   void initState() {
@@ -23,13 +24,17 @@ class _MovieViewState extends State<MovieView> {
   }
 
   getfilm() async {
+    print("Fetching movies...");
     var data = await movieService.getMovie();
+    print("Fetch complete. Status: ${data.status}");
     if (data.status == true) {
       setState(() {
         film = data.data;
+        print("Movies loaded: ${film!.length}");
+        print("Movies data: ${film}");
       });
     } else {
-      print(data.message);
+      print("Error: ${data.message}");
     }
   }
 
@@ -46,7 +51,10 @@ class _MovieViewState extends State<MovieView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => TambahMovieView(title: "Tambah Movie", item: null),
+                  builder: (context) => TambahMovieView(
+                    title: "Tambah Movie",
+                    item: null,
+                  ),
                 ),
               );
             },
@@ -61,40 +69,57 @@ class _MovieViewState extends State<MovieView> {
                   itemBuilder: (context, index) {
                     return Card(
                       child: ListTile(
-                        leading: Image(image: NetworkImage(film![index].posterPath)),
-                        title: Text(film![index].title),
-                        trailing: PopupMenuButton(
-                          itemBuilder: (BuildContext context) {
-                            return action.map((r) {
-                              return PopupMenuItem(
-                                onTap: () async {
-                                  if (r == "Update") {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => TambahMovieView(
-                                          title: "Update Movie",
-                                          item: film![index],
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    var results = await AlertMessage().showAlertDialog(context);
-                                    if (results != null && results.containsKey('status')) {
-                                      if (results['status'] == true) {
-                                        var res = await movieService.hapusMovie(context, film![index].id);
-                                        if (res.status == true) {
-                                          AlertMessage().showAlert(context, res.message, true);
-                                          getfilm();
-                                        } else {
-                                          AlertMessage().showAlert(context, res.message, false);
-                                        }
-                                      }
-                                    }
-                                  }
+                        leading: film![index]['posterpath'] != null
+                            ? Image.network(
+                                'http://localhost/toko_online_BismaAditama/public/' + film![index]['posterpath'],
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(Icons.error);
                                 },
-                                value: r,
-                                child: Text(r),
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Icon(Icons.movie),
+                        title: Text(film![index]['title'] ?? 'No Title'),
+                        trailing: PopupMenuButton<String>(
+                          onSelected: (String value) async {
+                            if (value == "Update") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TambahMovieView(
+                                    title: "Update Movie",
+                                    item: MovieModel.fromJson(film![index]), // Convert JSON to MovieModel
+                                  ),
+                                ),
+                              );
+                            } else if (value == "Delete") {
+                              var results = await AlertMessage().showAlertDialog(context);
+                              if (results != null && results.containsKey('status')) {
+                                if (results['status'] == true) {
+                                  var res = await movieService.hapusMovie(context, film![index]['id']);
+                                  if (res.status == true) {
+                                    AlertMessage().showAlert(context, res.message, true);
+                                    getfilm();
+                                  } else {
+                                    AlertMessage().showAlert(context, res.message, false);
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return action.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
                               );
                             }).toList();
                           },

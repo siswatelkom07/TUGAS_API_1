@@ -3,6 +3,7 @@ import 'package:flutter_application_1/views/home.dart';
 import 'package:flutter_application_1/views/login_view.dart';
 import 'package:flutter_application_1/views/movie_view.dart';
 import 'package:flutter_application_1/views/register_view.dart';
+import 'package:flutter_application_1/views/tambah_movie_view.dart';
 
 void main() {
   runApp(MaterialApp(

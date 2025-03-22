@@ -7,30 +7,46 @@ import 'package:flutter_application_1/services/url.dart' as url;
 
 class MovieService {
   Future getMovie() async {
-    UserLogin userLogin = UserLogin();
-    var user = await userLogin.getUserLogin();
-    if (user.status == false) {
-      ResponseDataList response =
-          ResponseDataList(status: false, message: "Anda belum login");
-      return response;
-    }
-    var uri = Uri.parse(url.BaseUrl + "admin/getmovie");
-    Map<String, String> headers = {
-      "Authorization": "Bearer ${user.token}",
-    };
-    var getMovie = await http.get(uri, headers: headers);
-    if (getMovie.statusCode == 200) {
-      var data = json.decode(getMovie.body);
-      ResponseDataList response =
-          ResponseDataList(status: true, message: "Sukses", data: data);
-      return response;
-    } else {
-      ResponseDataList response = ResponseDataList(
-          status: false,
-          message: "Gagal mengambil data movie error ${getMovie.statusCode}");
-      return response;
+    try {
+      UserLogin userLogin = UserLogin();
+      var user = await userLogin.getUserLogin();
+      if (user.status == false) {
+        ResponseDataList response =
+            ResponseDataList(status: false, message: "Anda belum login");
+        return response;
+      }
+      var uri = Uri.parse(url.BaseUrl + "admin/getmovie");
+      Map<String, String> headers = {
+        "Authorization": "Bearer ${user.token}",
+      };
+
+      // Debug: Print the request details
+      print("Request URL: $uri");
+      print("Request Headers: $headers");
+
+      var getMovie = await http.get(uri, headers: headers);
+
+      // Debug: Print the response details
+      print("Response Status Code: ${getMovie.statusCode}");
+      print("Response Body: ${getMovie.body}");
+
+      if (getMovie.statusCode == 200) {
+        var data = json.decode(getMovie.body);
+        ResponseDataList response =
+            ResponseDataList(status: true, message: "Sukses", data: data['data']);
+        return response;
+      } else {
+        ResponseDataList response = ResponseDataList(
+            status: false,
+            message: "Gagal mengambil data movie error ${getMovie.statusCode}");
+        return response;
+      }
+    } catch (e) {
+      print("Exception caught in getMovie: $e");
+      return ResponseDataList(status: false, message: "Exception: $e");
     }
   }
+
   Future insertMovie(request, image, id) async {
     UserLogin userLogin = UserLogin();
     var user = await userLogin.getUserLogin();
@@ -88,6 +104,7 @@ class MovieService {
       return response;
     }
   }
+
   Future hapusMovie(context, id) async {
     UserLogin userLogin = UserLogin();
     var uri = Uri.parse(url.BaseUrl + "/admin/hapusmovie/$id");
@@ -122,6 +139,5 @@ class MovieService {
       return response;
     }
   }
-
 }
 
